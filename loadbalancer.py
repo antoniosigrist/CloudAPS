@@ -139,13 +139,27 @@ def criarInstancia(user_data,numero,tag):
 
 
 			instance = ec2_.create_instances(
-
+#sudo apt-get install -y <package-name>
 			    ImageId='ami-0ac019f4fcb7cb7e6',
 			    MinCount=1,
 			    MaxCount=1,
 			    KeyName='antonio2',
 			    InstanceType='t2.micro',
-			    UserData=user_data,
+			    UserData='''#!/bin/bash
+							sudo apt-get -y update
+							sudo apt install snapd
+							sudo apt-get -y install python
+							sudo apt-get --assume-yes install python-pip
+							pip install boto3
+							pip install Flask
+							git clone https://github.com/antoniosigrist/CloudAPS.git
+							pip install requests
+							cd ..
+							cd ..
+							cd CloudAPS
+							export FLASK_APP=WebServer.py
+							python -m flask run --host=0.0.0.0
+			''',
 			    TagSpecifications=[
 		        {
 		            'ResourceType': 'instance',
@@ -191,18 +205,12 @@ def criarInstancia(user_data,numero,tag):
 user_data = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
-			sudo apt-get --assume-yes install python3
-			sudo apt-get --assume-yes install python3-pip
-			pip3 install boto3
-			pip3 install Flask
+			sudo apt-get -y install python
+			sudo apt-get --assume-yes install python-pip
+			pip install boto3
+			pip install Flask
+			pip install requests
 			git clone https://github.com/antoniosigrist/CloudAPS.git
-			pip3 install requests
-			cd ..
-			cd ..
-			cd CloudAPS
-			export FLASK_APP=loadbalancer.py
-			touch oi.txt
-			python3 -m flask run --host=0.0.0.0
 			'''
 
 criarInstancia(user_data,1,"Owner")
@@ -246,19 +254,19 @@ def adicionaLista(loadbalancer):
 user_data = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
-			sudo apt install -y python3-pip 
-			git clone https://github.com/antoniosigrist/CloudAPS.git
+			sudo apt-get -y install python
+			sudo apt-get --assume-yes install python-pip
 			pip install boto3
 			pip install Flask
+			git clone https://github.com/antoniosigrist/CloudAPS.git
 			pip install requests
 			cd ..
 			cd ..
 			cd CloudAPS
 			export FLASK_APP=WebServer.py
-			touch instancia.txt
 			python -m flask run --host=0.0.0.0
 			'''
-
+		
 criarInstancia(user_data,1,"Owner2")
 
 

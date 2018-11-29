@@ -3,24 +3,19 @@ from aps1 import *
 import requests
 #import request as req
 
-import os.path
+
+dic = {}
+
+primarykey = len(dic)
 
 
-def root_dir():  
+def adicionaTarefa(tarefa):
 
-    return os.path.abspath(os.path.dirname(__file__))
+	global dic
+	global primarykey
 
-def get_file(filename): 
-
-    try:
-
-        src = os.path.join(root_dir(), filename)
-
-        return open(src).read()
-
-    except IOError as exc:
-
-        return str(exc)
+	dic[str(primarykey)] = tarefa
+	primarykey += 1
 
 
 app = Flask(__name__)
@@ -29,9 +24,7 @@ app = Flask(__name__)
 @app.route("/", methods=['GET'])
 
 def index():  
-
-    content = get_file('home.html')
-    return Response(content, mimetype="text/html")
+    return "200"
 
 @app.route("/Tarefa/", methods=['POST','GET'])
 def tarefas():
@@ -109,5 +102,5 @@ def healthcheck():
 	print("Rodou")
 	return "200"
 
-# if __name__ == '__main__':
-#    app.run(host='0.0.0.0')
+if __name__ == '__main__':
+   app.run(host='0.0.0.0')
