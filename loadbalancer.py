@@ -8,6 +8,7 @@ from flask import Flask,request,render_template, Response
 import requests
 import json
 from pprint import pprint
+import threading
 
 
 
@@ -32,6 +33,35 @@ def escolheIp(lista_ips):
 		return ip
 
 
+app = Flask(__name__)
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+
+	if request.method == 'POST':
+
+		try:
+
+			json = request.get_json()
+			res = requests.post(server_addr, json=json)
+
+			return res
+
+		except:
+
+		 	print("POST ERROR")
+
+	else:
+
+		try:	
+			r = requests.get(server_addr)
+			return r
+		except:
+
+			print("GET ERROR")
+
+			return "ERROR GET /Tarefa"
 ### Apagando uma key pair
 
 try: 
@@ -191,7 +221,7 @@ def criarInstancia(user_data,numero,tag):
 user_data = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
-			sudo apt install -y python3-pip 
+			sudo apt install -y python-pip 
 			sudo apt-get install -y python-pip git awscli
 			git clone https://github.com/antoniosigrist/CloudAPS.git
 			pip install boto3
@@ -200,7 +230,7 @@ user_data = '''#!/bin/bash
 			cd ..
 			cd ..
 			cd CloudAPS/
-			export FLASK_APP=s3.py
+			export FLASK_APP=loadbalancer.py
 			python -m flask run
 			'''
 
@@ -211,111 +241,67 @@ for i in ip_dic:
 	loadbalancer.append(i)
 	loadbalancer.append(ip_dic[i])
 
-def adicionaLista(loadbalancer):
-
-	response = ec2_.instances.filter(Filters=[{
-	'Name': "instance-state-name",
-	'Values': ['running']
-	}])
-
-
-	for instance in response:
-
-		for tag in instance.tags:
-
-			if "Owner" in tag['Key']:
-
-				if instance.instance_id not in ip_dic:
-
-					ip_dic[instance.instance_id] = instance.public_ip_address
-					loadbalancer.append(instance.instance_id)
-					loadbalancer.append(instance.public_ip_address)
-
-			elif "Owner2" in tag['Key']:
-				if instance.instance_id not in ip_dic:
-
-					print("Adicionou owner 2")
-					ip_dic[instance.instance_id] = instance.public_ip_address
-
-		return loadbalancer
+criarInstancia()
 
 
 #loadbalancer = adicionaLista(loadbalancer)
+#			sudo apt install snapd
 
 user_data = '''#!/bin/bash
-			sudo apt-get -y update
-			sudo apt install snapd
-			sudo apt-get -y install python
-			sudo apt-get --assume-yes install python-pip
-			pip install boto3
-			pip install Flask
-			git clone https://github.com/antoniosigrist/CloudAPS.git
-			pip install requests
-			cd ..
-			cd ..
-			cd CloudAPS
-			export FLASK_APP=WebServer.py
-			python -m flask run --host=0.0.0.0
-			'''
-		
-criarInstancia(user_data,1,"Owner2")
+sudo apt-get -y update
+sudo apt install snapd
+sudo apt-get install -y python-pip git awscli
+git clone https://github.com/antoniosigrist/CloudAPS.git
+pip install boto3
+pip install Flask
+pip install requests
+cd ..
+cd ..
+cd CloudAPS/
+export FLASK_APP=WebServer.py
+python -m flask run --host=0.0.0.0
+'''
 
-
-#loadbalancer = adicionaLista(loadbalancer)
-
-print("IP LB: "+ loadbalancer[1])
-
-random_number = randint(0,len(ip_dic)-1)
+criarInstancia(user_data,1,"Agregadora")
 
 for i in ip_dic:
 
-	lista_ips.append(ip_dic[i])
+	if i != loadbalancer[0]:
+		agregadora.append(i)
+		agregadora.append(ip_dic[i])
 
-random_ip = lista_ips[random_number]
+def checkhealth(lista_ips):
 
-print("IP DIC")
-print(ip_dic)
+	ipsativos = len(lista_ips)-2
 
-while random_ip == loadbalancer[1]:
+	while ipsativos < 3:
+
+		criarInstancia(user_data,1, "Owner2")
+		ipsativos = len(lista_ips)-2
+
 
 	random_number = randint(0,len(ip_dic)-1)
+
+	for i in ip_dic:
+
+		lista_ips.append(ip_dic[i])
+
 	random_ip = lista_ips[random_number]
-	#print("Random IP: "+random_ip)
+
+	print("IP DIC")
+	print(ip_dic)
+
+	while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
+
+		random_number = randint(0,len(ip_dic)-1)
+		random_ip = lista_ips[random_number]
 
 
-server_addr = "http://"+random_ip+":5000/Tarefa/"
+	server_addr = "http://"+random_ip+":5000/Tarefa/"
+	print ("Endereco randomico: "+ server_addr)
 
-print ("Endereco randomico: "+ server_addr)
 
-app = Flask(__name__)
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-
-	if request.method == 'POST':
-
-		try:
-
-			json = request.get_json()
-			res = requests.post(server_addr, json=json)
-
-		except:
-
-		 	print("POST ERROR")
-
-	else:
-
-		try:	
-			r = requests.get(server_addr)
-			return r
-		except:
-			print("GET ERROR")
-
-			return "ERROR GET /Tarefa"
+threading.Thread(target=healthcheck,args = [lista_ips]).start()
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0')
-
-
-
+   app.run(host='0.0.0.0', port=5000)

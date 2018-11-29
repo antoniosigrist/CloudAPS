@@ -1,5 +1,4 @@
 from flask import Flask,request,render_template, Response
-from aps1 import *
 import requests
 #import request as req
 
@@ -102,5 +101,5 @@ def healthcheck():
 	print("Rodou")
 	return "200"
 
-if __name__ == '__main__':
-   app.run(host='0.0.0.0')
+# if __name__ == '__main__':
+#    app.run(host='0.0.0.0')
