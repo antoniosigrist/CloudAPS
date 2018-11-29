@@ -4,7 +4,7 @@ import sys
 import json
 import requests
 
-server_addr = 'http://localhost:5000/Tarefa/' 
+server_addr = 'http://18.205.106.110/Tarefa/' 
 
 def adicionar(valor):
 	

@@ -63,14 +63,14 @@ except Exception as e:
 	print ("Erro ao importar chave")
 	print(e)
 
-response = client.describe_key_pairs(
-    
-    KeyNames=[
+	response = client.describe_key_pairs(
+	    
+	    KeyNames=[
 
-        'antonio2',
-    ],
-    DryRun=False
-)
+	        'antonio2',
+	    ],
+	    DryRun=False
+	)
 
 ### Apagando um security grup
 
@@ -199,8 +199,8 @@ user_data = '''#!/bin/bash
 			pip3 install requests
 			cd ..
 			cd ..
-			cd CloudAPS/APS1
-			export FLASK_APP=s3.py
+			cd CloudAPS
+			export FLASK_APP=loadbalancer.py
 			touch oi.txt
 			python3 -m flask run --host=0.0.0.0
 			'''
@@ -209,8 +209,8 @@ criarInstancia(user_data,1,"Owner")
 
 for i in ip_dic:
 
-	loadbalancer.append(instance_id)
-	loadbalancer.append(public_ip_address)
+	loadbalancer.append(i)
+	loadbalancer.append(ip_dic[i])
 
 def adicionaLista(loadbalancer):
 
@@ -247,15 +247,14 @@ user_data = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
 			sudo apt install -y python3-pip 
-			sudo apt-get install -y python-pip git awscli
 			git clone https://github.com/antoniosigrist/CloudAPS.git
 			pip install boto3
 			pip install Flask
 			pip install requests
 			cd ..
 			cd ..
-			cd CloudAPS/APS1
-			export FLASK_APP=Flask.py
+			cd CloudAPS
+			export FLASK_APP=WebServer.py
 			touch instancia.txt
 			python -m flask run --host=0.0.0.0
 			'''
