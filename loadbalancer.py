@@ -174,6 +174,14 @@ def criarInstancia(user_data,numero,tag):
 			# Reload the instance attributes
 			instance.load()
 
+			try:
+
+				ip_dic[instance.instance_id] = instance.public_ip_address
+
+			except:
+
+				print("Não deu para inserir no dic")
+
 		except Exception as e:
 
 			print("Erro para criar uma instancia")
@@ -183,21 +191,26 @@ def criarInstancia(user_data,numero,tag):
 user_data = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
-			sudo apt install -y python3-pip 
-			sudo apt-get install -y python-pip git awscli
+			sudo apt-get --assume-yes install python3
+			sudo apt-get --assume-yes install python3-pip
+			pip3 install boto3
+			pip3 install Flask
 			git clone https://github.com/antoniosigrist/CloudAPS.git
-			pip install boto3
-			pip install Flask
-			pip install requests
+			pip3 install requests
 			cd ..
 			cd ..
 			cd CloudAPS/APS1
 			export FLASK_APP=s3.py
-			python -m flask run --host=0.0.0.0
+			touch oi.txt
+			python3 -m flask run --host=0.0.0.0
 			'''
 
 criarInstancia(user_data,1,"Owner")
 
+for i in ip_dic:
+
+	loadbalancer.append(instance_id)
+	loadbalancer.append(public_ip_address)
 
 def adicionaLista(loadbalancer):
 
@@ -213,17 +226,22 @@ def adicionaLista(loadbalancer):
 
 			if "Owner" in tag['Key']:
 
-				ip_dic[instance.instance_id] = instance.public_ip_address
-				loadbalancer.append(instance.instance_id)
-				loadbalancer.append(instance.public_ip_address)
+				if instance.instance_id not in ip_dic:
+
+					ip_dic[instance.instance_id] = instance.public_ip_address
+					loadbalancer.append(instance.instance_id)
+					loadbalancer.append(instance.public_ip_address)
 
 			elif "Owner2" in tag['Key']:
+				if instance.instance_id not in ip_dic:
 
-				ip_dic[instance.instance_id] = instance.public_ip_address
+					print("Adicionou owner 2")
+					ip_dic[instance.instance_id] = instance.public_ip_address
 
 		return loadbalancer
 
-loadbalancer = adicionaLista(loadbalancer)
+
+#loadbalancer = adicionaLista(loadbalancer)
 
 user_data = '''#!/bin/bash
 			sudo apt-get -y update
@@ -238,13 +256,14 @@ user_data = '''#!/bin/bash
 			cd ..
 			cd CloudAPS/APS1
 			export FLASK_APP=Flask.py
+			touch instancia.txt
 			python -m flask run --host=0.0.0.0
 			'''
 
 criarInstancia(user_data,1,"Owner2")
 
 
-loadbalancer = adicionaLista(loadbalancer)
+#loadbalancer = adicionaLista(loadbalancer)
 
 print("IP LB: "+ loadbalancer[1])
 
@@ -256,12 +275,14 @@ for i in ip_dic:
 
 random_ip = lista_ips[random_number]
 
+print("IP DIC")
+print(ip_dic)
 
 while random_ip == loadbalancer[1]:
 
 	random_number = randint(0,len(ip_dic)-1)
 	random_ip = lista_ips[random_number]
-
+	#print("Random IP: "+random_ip)
 
 
 server_addr = "http://"+random_ip+":5000/Tarefa/"
