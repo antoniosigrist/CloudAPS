@@ -1,0 +1,70 @@
+#!/usr/bin/env 
+
+import sys
+import json
+import requests
+
+server_addr = 'http://54.91.208.168:5000/Tarefa/' 
+
+def adicionar(valor):
+	
+	json = '''value":%s''' % valor
+
+	res = requests.post(server_addr, json=json)
+	print("res")
+	print(res)
+
+	#print 'response from server:',res.text
+
+def listar():
+
+	r = requests.get(server_addr)
+
+def buscar(id):
+
+	r = requests.get(server_addr+str(id))
+
+def apagar(id):
+
+	r = requests.delete(server_addr+str(id))
+
+def atualizar(id,valor):
+
+
+	r = requests.put(server_addr+str(id), data = {str(id):valor})
+
+
+if __name__ == "__main__":
+
+	acao = sys.argv[1]
+
+	if acao == "adicionar":
+
+		tamanho_entrada = len(sys.argv)
+
+		for i in range (2,tamanho_entrada):
+
+			adicionar(sys.argv[i])
+
+	elif acao == "listar":
+
+		listar()
+			
+	elif acao == "apagar":
+
+		tamanho_entrada = len(sys.argv)
+
+		for i in range (2,tamanho_entrada):
+
+			apagar(sys.argv[i])
+
+	elif acao == "buscar":
+
+		buscar(sys.argv[2])
+
+	elif acao == "atualizar":
+
+		atualizar(sys.argv[2],sys.argv[3])
+			
+			
+			
