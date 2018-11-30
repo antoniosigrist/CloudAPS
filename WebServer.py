@@ -35,11 +35,10 @@ def tarefas():
 		try:
 
 			data = request.get_json()
-			
+			print(data)
 			value = data.split(":")[1]
-
+			print(value)
 			adicionaTarefa(value)
-
 			print (dic)
 
 			return "Rodou POST /Tarefa/"

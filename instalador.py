@@ -258,7 +258,7 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 	pip install Flask
 	pip install requests
 	cd CloudAPS/
-	export FLASK_APP=curiosidades.py 
+	export FLASK_APP=catchall.py 
 	export DB_HOST={0}
 	python -m flask run --host=0.0.0.0""".format(str(agregadora[1]))
 
@@ -280,9 +280,6 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 
 				ip_dic[instance] = False
 
-				print ("ip_dic pos none")
-
-				print (ip_dic)
 
 			if instance.state['Name'] == 'running':
 
@@ -295,8 +292,6 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 			ipsativos += 1
 
 		random_number = randint(0,len(ip_dic)-1)
-		print ("ip_dic fora")
-		print (ip_dic)
 
 		for i in ip_dic:
 
@@ -327,9 +322,12 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 
 		while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
 
-
-			random_number = randint(0,len(lista_ips)-1)
-			random_ip = lista_ips[random_number]
+			try:
+				random_number = randint(0,len(lista_ips)-1)
+				print(random_number)
+				random_ip = lista_ips[random_number]
+			except:
+				print("Loop infinito")
 
 
 		server_addr = "http://"+random_ip+":5000/"
@@ -340,15 +338,11 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 		print("Conferir os resultados em: http://"+str(agregadora[1])+":5000/\n")
 
 
-
-
 threading.Thread(target=checkhealth,args = [ip_dic,agregadora,loadbalancer]).start()
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5000)
 
-
-# https://gist.github.com/ableasdale/8cb7a61cad3202e09bab3e11c4639133
 
 
 

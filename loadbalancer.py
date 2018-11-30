@@ -273,7 +273,7 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 	pip install Flask
 	pip install requests
 	cd CloudAPS/
-	export FLASK_APP=curiosidades.py 
+	export FLASK_APP=catchall.py 
 	export DB_HOST={0}
 	python -m flask run --host=0.0.0.0""".format(str(agregadora[1]))
 
@@ -304,7 +304,7 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 				ipsativos += 1
 
 
-		while ipsativos < 1:
+		while ipsativos < 3:
 
 			criarInstancia(user_data,1, "Owner2")
 			ipsativos += 1
@@ -342,9 +342,14 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 
 		while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
 
+			try:
+				print("len lista ips")
+				random_number = randint(0,len(lista_ips)-1)
+				print(random_number)
+				random_ip = lista_ips[random_number]
 
-			random_number = randint(0,len(lista_ips)-1)
-			random_ip = lista_ips[random_number]
+			except:
+				print("Loop Infinito")
 
 
 		server_addr = "http://"+random_ip+":5000/"
@@ -353,8 +358,6 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 		print("IPs disponíveis: ")
 		print(lista_ips)
 		print("Conferir os resultados em: http://"+str(agregadora[1])+":5000/\n")
-
-
 
 
 threading.Thread(target=checkhealth,args = [ip_dic,agregadora,loadbalancer]).start()
