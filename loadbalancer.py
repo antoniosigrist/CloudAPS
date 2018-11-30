@@ -219,36 +219,33 @@ def criarInstancia(user_data,numero,tag):
 			print(e)
 
 
-user_data_load = '''#!/bin/bash
-sudo apt-get -y update
-sudo apt install snapd
-sudo apt install -y python-pip 
-sudo apt-get install -y python-pip git awscli
-git clone https://github.com/antoniosigrist/CloudAPS.git
-pip install boto3
-pip install Flask
-pip install requests
-cd ..
-cd ..
-cd CloudAPS/
-export FLASK_APP=loadbalancer.py
-python -m flask run
-'''
-user_data_agreg = '''#!/bin/bash
-sudo apt-get -y update
-sudo apt install snapd
-sudo apt install -y python-pip 
-sudo apt-get install -y python-pip git awscli
-git clone https://github.com/antoniosigrist/CloudAPS.git
-pip install boto3
-pip install Flask
-pip install requests
-cd ..
-cd ..
-cd CloudAPS/
-export FLASK_APP=WebServer.py
-python -m flask run
-'''
+user_data_load = """#!/bin/bash
+	cd home
+	cd ubuntu
+	sudo apt -y update
+	sudo apt install snapd
+	sudo apt install -y python-pip 
+	git clone https://github.com/antoniosigrist/CloudAPS.git
+	pip install boto3
+	pip install Flask
+	pip install requests
+	cd CloudAPS/
+	export FLASK_APP=loadbalancer.py
+	python -m flask run"""
+
+user_data_agreg = """#!/bin/bash
+	cd home
+	cd ubuntu
+	sudo apt -y update
+	sudo apt install snapd
+	sudo apt install -y python-pip 
+	git clone https://github.com/antoniosigrist/CloudAPS.git
+	pip install boto3
+	pip install Flask
+	pip install requests
+	cd CloudAPS/
+	export FLASK_APP=WebServer.py
+	python -m flask run"""
 
 criarInstancia(user_data_load,1,"Owner")
 
@@ -272,20 +269,18 @@ print("IP Agregadora: "+agregadora[1])
 def checkhealth(ip_dic,agregadora):
 
 	user_data = """#!/bin/bash
-	sudo apt-get -y update
+	cd home
+	cd ubuntu
+	sudo apt -y update
 	sudo apt install snapd
 	sudo apt install -y python-pip 
-	sudo apt-get install -y python-pip git awscli
 	git clone https://github.com/antoniosigrist/CloudAPS.git
 	pip install boto3
 	pip install Flask
 	pip install requests
-	cd ..
-	cd ..
 	cd CloudAPS/
 	export FLASK_APP=curiosidades.py {}
-	python -m flask run
-	""".format(agregadora[1])
+	python -m flask run""".format(agregadora[1])
 
 	lista_ips_excluidos = []
 
@@ -333,7 +328,7 @@ def checkhealth(ip_dic,agregadora):
 
 			if i in lista_ips_excluidos:
 
-				lista_ips.delete(i)
+				lista_ips.remove(i)
 
 		random_number = randint(0,len(lista_ips)-1)
 		random_ip = lista_ips[random_number]
