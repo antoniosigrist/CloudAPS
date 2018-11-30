@@ -2,7 +2,7 @@
 
 Como o projeto funciona:
 
-  1. Configura todas variáveis de ambu
+  1. Configura todas variáveis de ambiente na aws para criar uma instância utilizando Boto3
 
   2. Ele cria uma LoadBalancer que fica chegando se existem 3 instâncias ativas. Ele direciona todos requets que caem para ele para uma das três máquinas ativas. 
   
@@ -24,7 +24,6 @@ Como o projeto funciona:
                 #sudo apt install -y python-pip 
                 #git clone https://github.com/antoniosigrist/CloudAPS.git
                 #cd CloudAPS
-                #cd CloudAPS
                 
             - Rode o script instalador.sh
             - Rode o comando ` aws configure ` no terminal
@@ -38,4 +37,4 @@ Como o projeto funciona:
         Caso queira criar o Loadbalancer na propria maquina, basta rodar o arquivo loabalancer.py ao inves dos instaladores (lembre-se de estar conectado na aws com suas credenciais no aws configure)
         
         
-        **ATEÇÃO** - Esse projeto tem como pré requisito que não tenha nenhuma outra máquina no dashboard da EC2. Nem mesmo terminated.
+        **ATEÇÃO** - Esse projeto tem como pré requisito que não tenha nenhuma outra máquina rodando no dashboard da EC2.
