@@ -2,6 +2,7 @@ from flask import Flask,request,render_template, Response
 import requests
 import json
 import sys
+import os
 
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ def catch_all(path):
 			json = request.get_json()
 			res = requests.post(server_addr, json=json)
 
-			return res
+			return res.text
 
 		except:
 
@@ -27,7 +28,7 @@ def catch_all(path):
 
 		try:	
 			r = requests.get(server_addr)
-			return r
+			return r.text
 		except:
 			
 			print("GET ERROR")
@@ -36,10 +37,10 @@ def catch_all(path):
 
 if __name__ == '__main__':
 
-	server_addr = sys.argv[1]
+	server_addr = os.environ.get('DB_HOST')
 
 	print(server_addr)
-	
+
 	server_addr = "http://"+server_addr+":5000/Tarefa/"
 	app.run(host='0.0.0.0')
 

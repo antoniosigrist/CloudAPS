@@ -9,6 +9,7 @@ import requests
 import json
 from pprint import pprint
 import threading
+import os
 
 
 
@@ -231,7 +232,7 @@ user_data_load = """#!/bin/bash
 	pip install requests
 	cd CloudAPS/
 	export FLASK_APP=loadbalancer.py
-	python -m flask run"""
+	python -m flask run --host=0.0.0.0"""
 
 user_data_agreg = """#!/bin/bash
 	cd home
@@ -245,7 +246,7 @@ user_data_agreg = """#!/bin/bash
 	pip install requests
 	cd CloudAPS/
 	export FLASK_APP=WebServer.py
-	python -m flask run"""
+	python -m flask run --host=0.0.0.0"""
 
 criarInstancia(user_data_load,1,"Owner")
 
@@ -279,8 +280,9 @@ def checkhealth(ip_dic,agregadora):
 	pip install Flask
 	pip install requests
 	cd CloudAPS/
-	export FLASK_APP=curiosidades.py {}
-	python -m flask run""".format(agregadora[1])
+	export FLASK_APP=curiosidades.py 
+	export DB_HOST={0}
+	python -m flask run --host=0.0.0.0""".format(str(agregadora[1]))
 
 	lista_ips_excluidos = []
 
@@ -344,7 +346,7 @@ def checkhealth(ip_dic,agregadora):
 
 
 
-		server_addr = "http://"+random_ip+":5000/Tarefa/"
+		server_addr = "http://"+random_ip+":5000/"
 
 		print ("Endereco randomico: "+ server_addr)
 
