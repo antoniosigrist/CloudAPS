@@ -210,19 +210,6 @@ def criarInstancia(user_data,numero,tag):
 			print(e)
 
 
-user_data_load = """#!/bin/bash
-	cd home
-	cd ubuntu
-	sudo apt -y update
-	sudo apt install snapd
-	sudo apt install -y python-pip 
-	git clone https://github.com/antoniosigrist/CloudAPS.git
-	pip install boto3
-	pip install Flask
-	pip install requests
-	cd CloudAPS/
-	export FLASK_APP=loadbalancer.py
-	python -m flask run --host=0.0.0.0"""
 
 user_data_agreg = """#!/bin/bash
 	cd home
@@ -238,22 +225,21 @@ user_data_agreg = """#!/bin/bash
 	export FLASK_APP=WebServer.py
 	python -m flask run --host=0.0.0.0"""
 
-criarInstancia(user_data_load,1,"Owner")
 
-for i in ip_dic:
+for instance in ec2_.instances.all():
 
-	loadbalancer.append(i)
-	loadbalancer.append(ip_dic[i])
+	loadbalancer.append(instance.instance_id)
+	loadbalancer.append(instance[public_ip_address])
+
 
 criarInstancia(user_data_agreg,1,"Agregadora")
+
 
 for i in ip_dic:
 
 	if i != loadbalancer[0]:
 		agregadora.append(i)
 		agregadora.append(ip_dic[i])
-
-print("IP Agregadora: "+agregadora[1])
 
 
 
@@ -301,7 +287,7 @@ def checkhealth(ip_dic,agregadora,loadbalancer):
 				ipsativos += 1
 
 
-		while ipsativos < 1:
+		while ipsativos < 3:
 
 			criarInstancia(user_data,1, "Owner2")
 			ipsativos += 1
