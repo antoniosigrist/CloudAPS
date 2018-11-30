@@ -36,3 +36,6 @@ Como o projeto funciona:
  
         
         Caso queira criar o Loadbalancer na propria maquina, basta rodar o arquivo loabalancer.py ao inves dos instaladores (lembre-se de estar conectado na aws com suas credenciais no aws configure)
+        
+        
+        **ATEÇÃO** - Esse projeto tem como pré requisito que não tenha nenhuma outra máquina no dashboard da EC2. Nem mesmo terminated.
