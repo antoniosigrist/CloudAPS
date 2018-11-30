@@ -26,9 +26,11 @@ def catch_all(path):
 
 	else:
 
-		try:	
+		try:
+
 			r = requests.get(server_addr)
 			return r.text
+			
 		except:
 			
 			print("GET ERROR")

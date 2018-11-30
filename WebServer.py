@@ -59,7 +59,7 @@ def tarefas():
 
 			print (dic_list)
 
-			return "Rodou GET /Tarefa/"
+			return dic.text
 
 		except:
 

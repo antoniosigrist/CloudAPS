@@ -267,7 +267,7 @@ print("IP Agregadora: "+agregadora[1])
 
 
 
-def checkhealth(ip_dic,agregadora):
+def checkhealth(ip_dic,agregadora,loadbalancer):
 
 	user_data = """#!/bin/bash
 	cd home
@@ -338,20 +338,33 @@ def checkhealth(ip_dic,agregadora):
 		print("Lista de Ips disponiveis: ")
 		print(lista_ips)
 
+		try:
+
+			lista_ips.remove(agregadora[1])
+			lista_ips.remove(loadbalancer[1])
+
+		except:
+
+			print("Não apagou ips load e agreg da lista de ips")
 
 		while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
+
 
 			random_number = randint(0,len(lista_ips)-1)
 			random_ip = lista_ips[random_number]
 
 
-
 		server_addr = "http://"+random_ip+":5000/"
 
-		print ("Endereco randomico: "+ server_addr)
+		print("Fazer requisições para o endereço: http://"+str(loadbalancer[1])+":5000/\n")
+		print("IPs disponíveis: ")
+		print(lista_ips)
+		print("Conferir os resultados em: http://"+str(agregadora[1])+":5000/\n")
 
 
-threading.Thread(target=checkhealth,args = [ip_dic,agregadora]).start()
+
+
+threading.Thread(target=checkhealth,args = [ip_dic,agregadora,loadbalancer]).start()
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5000)
