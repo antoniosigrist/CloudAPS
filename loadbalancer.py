@@ -220,36 +220,35 @@ def criarInstancia(user_data,numero,tag):
 
 
 user_data_load = '''#!/bin/bash
-			sudo apt-get -y update
-			sudo apt install snapd
-			sudo apt install -y python-pip 
-			sudo apt-get install -y python-pip git awscli
-			git clone https://github.com/antoniosigrist/CloudAPS.git
-			pip install boto3
-			pip install Flask
-			pip install requests
-			cd ..
-			cd ..
-			cd CloudAPS/
-			export FLASK_APP=loadbalancer.py
-			python -m flask run
-			'''
-
+sudo apt-get -y update
+sudo apt install snapd
+sudo apt install -y python-pip 
+sudo apt-get install -y python-pip git awscli
+git clone https://github.com/antoniosigrist/CloudAPS.git
+pip install boto3
+pip install Flask
+pip install requests
+cd ..
+cd ..
+cd CloudAPS/
+export FLASK_APP=loadbalancer.py
+python -m flask run
+'''
 user_data_agreg = '''#!/bin/bash
-			sudo apt-get -y update
-			sudo apt install snapd
-			sudo apt install -y python-pip 
-			sudo apt-get install -y python-pip git awscli
-			git clone https://github.com/antoniosigrist/CloudAPS.git
-			pip install boto3
-			pip install Flask
-			pip install requests
-			cd ..
-			cd ..
-			cd CloudAPS/
-			export FLASK_APP=WebServer.py
-			python -m flask run
-			'''
+sudo apt-get -y update
+sudo apt install snapd
+sudo apt install -y python-pip 
+sudo apt-get install -y python-pip git awscli
+git clone https://github.com/antoniosigrist/CloudAPS.git
+pip install boto3
+pip install Flask
+pip install requests
+cd ..
+cd ..
+cd CloudAPS/
+export FLASK_APP=WebServer.py
+python -m flask run
+'''
 
 criarInstancia(user_data_load,1,"Owner")
 
@@ -272,35 +271,42 @@ print("IP Agregadora: "+agregadora[1])
 
 def checkhealth(ip_dic,agregadora):
 
-	user_data = '''#!/bin/bash
-				sudo apt-get -y update
-				sudo apt install snapd
-				sudo apt install -y python-pip 
-				sudo apt-get install -y python-pip git awscli
-				git clone https://github.com/antoniosigrist/CloudAPS.git
-				pip install boto3
-				pip install Flask
-				pip install requests
-				cd ..
-				cd ..
-				cd CloudAPS/
-				export FLASK_APP=curiosidades.py {}
-				python -m flask run
-				'''.format(agregadora[1])
+	user_data = """#!/bin/bash
+	sudo apt-get -y update
+	sudo apt install snapd
+	sudo apt install -y python-pip 
+	sudo apt-get install -y python-pip git awscli
+	git clone https://github.com/antoniosigrist/CloudAPS.git
+	pip install boto3
+	pip install Flask
+	pip install requests
+	cd ..
+	cd ..
+	cd CloudAPS/
+	export FLASK_APP=curiosidades.py {}
+	python -m flask run
+	""".format(agregadora[1])
 
+	lista_ips_excluidos = []
 
 	while(1):
 
 		ipsativos = -2
 		lista_ips = []
+		
 
 		for instance in ec2_.instances.all():
 
 			if instance.instance_id in ip_dic and instance.state['Name'] != 'running':
 
+				print ("IP Excluido "+str(instance.public_ip_address))
+
+				lista_ips_excluidos.append(instance.public_ip_address)
+
 				ip_dic[instance] = False
 
 				print ("ip_dic pos none")
+
 				print (ip_dic)
 
 			if instance.state['Name'] == 'running':
@@ -323,8 +329,17 @@ def checkhealth(ip_dic,agregadora):
 
 				lista_ips.append(ip_dic[i])
 
+		for i in lista_ips:
+
+			if i in lista_ips_excluidos:
+
+				lista_ips.delete(i)
+
 		random_number = randint(0,len(lista_ips)-1)
 		random_ip = lista_ips[random_number]
+
+		print("Lista de Ips disponiveis: ")
+		print(lista_ips)
 
 
 		while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
