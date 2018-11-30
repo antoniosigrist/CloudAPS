@@ -228,8 +228,10 @@ user_data_agreg = """#!/bin/bash
 
 for instance in ec2_.instances.all():
 
-	loadbalancer.append(instance.instance_id)
-	loadbalancer.append(instance[public_ip_address])
+	if instance.state['Name'] == 'running':
+
+		loadbalancer.append(instance.instance_id)
+		loadbalancer.append(instance[public_ip_address])
 
 
 criarInstancia(user_data_agreg,1,"Agregadora")

@@ -153,6 +153,9 @@ except Exception as e:
 
 
 ## Criando uma instancia Ubuntu 18
+
+# https://gist.github.com/ableasdale/8cb7a61cad3202e09bab3e11c4639133 - melhor git ensinando a pegar atributos da instancia da história
+
 def criarInstancia(user_data,numero,tag):
 
 	for i in range (0,numero):
@@ -360,7 +363,6 @@ if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5000)
 
 
-# https://gist.github.com/ableasdale/8cb7a61cad3202e09bab3e11c4639133
 
 
 
