@@ -1,7 +1,7 @@
 from flask import Flask,request,render_template, Response
 import requests
 import json
-
+import sys
 
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def catch_all(path):
 	if request.method == 'POST':
 
 		try:
-
+			server_addr = 
 			json = request.get_json()
 			res = requests.post(server_addr, json=json)
 
@@ -35,10 +35,22 @@ def catch_all(path):
 			return "ERROR GET /Tarefa"
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0')
+	
+	server_addr = sys.argv[1]
+	server_addr = "http://"+server_addr+":5000/Tarefa/"
+	app.run(host='0.0.0.0')
 
 
 
+
+	
+
+# def adicionaLista(loadbalancer):
+
+# 	response = ec2_.instances.filter(Filters=[{
+# 	'Name': "instance-state-name",
+# 	'Values': ['running']
+# 	}])
 
 
 	# for instance in response:

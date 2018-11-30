@@ -19,6 +19,7 @@ client = ec2
 lista_ips = []
 ip_dic = {}
 loadbalancer = []
+agregadora = []
 lista_ids = []
 
 def escolheIp(lista_ips):
@@ -182,7 +183,7 @@ def criarInstancia(user_data,numero,tag):
 		            'Tags': [
 		                {
 		                    'Key': tag,
-		                    'Value': 'Antonio'
+		                    'Value': "Antonio"
 		                },
 		            ]
 		        },
@@ -218,7 +219,7 @@ def criarInstancia(user_data,numero,tag):
 			print(e)
 
 
-user_data = '''#!/bin/bash
+user_data_load = '''#!/bin/bash
 			sudo apt-get -y update
 			sudo apt install snapd
 			sudo apt install -y python-pip 
@@ -234,35 +235,30 @@ user_data = '''#!/bin/bash
 			python -m flask run
 			'''
 
-criarInstancia(user_data,1,"Owner")
+user_data_agreg = '''#!/bin/bash
+			sudo apt-get -y update
+			sudo apt install snapd
+			sudo apt install -y python-pip 
+			sudo apt-get install -y python-pip git awscli
+			git clone https://github.com/antoniosigrist/CloudAPS.git
+			pip install boto3
+			pip install Flask
+			pip install requests
+			cd ..
+			cd ..
+			cd CloudAPS/
+			export FLASK_APP=WebServer.py
+			python -m flask run
+			'''
+
+criarInstancia(user_data_load,1,"Owner")
 
 for i in ip_dic:
 
 	loadbalancer.append(i)
 	loadbalancer.append(ip_dic[i])
 
-criarInstancia()
-
-
-#loadbalancer = adicionaLista(loadbalancer)
-#			sudo apt install snapd
-
-user_data = '''#!/bin/bash
-sudo apt-get -y update
-sudo apt install snapd
-sudo apt-get install -y python-pip git awscli
-git clone https://github.com/antoniosigrist/CloudAPS.git
-pip install boto3
-pip install Flask
-pip install requests
-cd ..
-cd ..
-cd CloudAPS/
-export FLASK_APP=WebServer.py
-python -m flask run --host=0.0.0.0
-'''
-
-criarInstancia(user_data,1,"Agregadora")
+criarInstancia(user_data_agreg,1,"Agregadora")
 
 for i in ip_dic:
 
@@ -270,38 +266,88 @@ for i in ip_dic:
 		agregadora.append(i)
 		agregadora.append(ip_dic[i])
 
-def checkhealth(lista_ips):
-
-	ipsativos = len(lista_ips)-2
-
-	while ipsativos < 3:
-
-		criarInstancia(user_data,1, "Owner2")
-		ipsativos = len(lista_ips)-2
+print("IP Agregadora: "+agregadora[1])
 
 
-	random_number = randint(0,len(ip_dic)-1)
 
-	for i in ip_dic:
+def checkhealth(ip_dic,agregadora):
 
-		lista_ips.append(ip_dic[i])
+	user_data = '''#!/bin/bash
+				sudo apt-get -y update
+				sudo apt install snapd
+				sudo apt install -y python-pip 
+				sudo apt-get install -y python-pip git awscli
+				git clone https://github.com/antoniosigrist/CloudAPS.git
+				pip install boto3
+				pip install Flask
+				pip install requests
+				cd ..
+				cd ..
+				cd CloudAPS/
+				export FLASK_APP=curiosidades.py {}
+				python -m flask run
+				'''.format(agregadora[1])
 
-	random_ip = lista_ips[random_number]
 
-	print("IP DIC")
-	print(ip_dic)
+	while(1):
 
-	while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
+		ipsativos = -2
+		lista_ips = []
+
+		for instance in ec2_.instances.all():
+
+			if instance.instance_id in ip_dic and instance.state['Name'] != 'running':
+
+				ip_dic[instance] = False
+
+				print ("ip_dic pos none")
+				print (ip_dic)
+
+			if instance.state['Name'] == 'running':
+
+				ipsativos += 1
+
+
+		while ipsativos < 1:
+
+			criarInstancia(user_data,1, "Owner2")
+			ipsativos += 1
 
 		random_number = randint(0,len(ip_dic)-1)
+		print ("ip_dic fora")
+		print (ip_dic)
+
+		for i in ip_dic:
+
+			if ip_dic[i] != False:
+
+				lista_ips.append(ip_dic[i])
+
+		random_number = randint(0,len(lista_ips)-1)
 		random_ip = lista_ips[random_number]
 
 
-	server_addr = "http://"+random_ip+":5000/Tarefa/"
-	print ("Endereco randomico: "+ server_addr)
+		while random_ip == loadbalancer[1] or random_ip == agregadora[1]:
+
+			random_number = randint(0,len(lista_ips)-1)
+			random_ip = lista_ips[random_number]
 
 
-threading.Thread(target=healthcheck,args = [lista_ips]).start()
+
+		server_addr = "http://"+random_ip+":5000/Tarefa/"
+
+		print ("Endereco randomico: "+ server_addr)
+
+
+threading.Thread(target=checkhealth,args = [ip_dic,agregadora]).start()
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5000)
+
+
+# https://gist.github.com/ableasdale/8cb7a61cad3202e09bab3e11c4639133
+
+
+
+
+
