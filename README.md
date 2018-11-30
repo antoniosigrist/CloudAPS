@@ -27,6 +27,9 @@ Como o projeto funciona:
                 #cd CloudAPS
                 
             - Rode o script instalador.sh
+            - Rode o comando ` aws configure ` no terminal
+            - Adicione nesse diretório o seu arquivo chamado antonio2.pub com sua keypair do projeto. 
+            - Rode o script instalador2.sh
             - Insira quando pedido suas credenciais da AWS. 
             - Espere por volta de 7 minutos para ter certeza que todas dependencias foram baixadas e os Flasks estão rodando na máquina. No terminal, você verá quais são os IPs do seu LB, das três maquinas disponíveis
                 e da maquina rodando o Webserver.
